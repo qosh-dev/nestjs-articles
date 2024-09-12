@@ -25,9 +25,8 @@ Template project for nestjs application
   <li> Clone this repository. </li>
   <li> Install dependencies: <code> npm install </code></li>
   <li> Create a .env file in the root directory, refer .env.example file  </li>
-  <li> Run docker containers for local development <code> sh scripts/build-local.sh </code> </li>
-  <li> Run migrations <code> npm run migration:run </code> in backend directory</li>
-  <li> Start the application: <code> npm run start:dev </code> in backend directory </li>
+  <li> Run docker containers for local development <code> sh scripts/build-local.sh</code>, script will automatically run migrations</li>
+  <li> Start the application: <code> npm run start:dev</code> in backend directory </li>
 </ol>
 
 ## Extra:
@@ -39,6 +38,7 @@ By running script <code> sh scripts/build-staging.sh </code>
   <li> For local development: <code> sh scripts/build-local.sh </code>  </li>
   <li> For staging development: <code> sh scripts/build-staging.sh </code>  </li>
   <li> For locally testing staging игшв: <code> sh scripts/test-build-staging.sh </code>  </li>
+  <li> For running migrations <code> npm run migration:run </code> in backend directory</li>
 </ol>
 
 ## Addons
