@@ -1,0 +1,129 @@
+version: '3.7'
+name: 'app-production'
+services:
+
+  traefik:
+    image: traefik:v2.9
+    command:
+      - --providers.docker=true
+    networks:
+      - dropin
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # -----------------------------------------------------------
+  #
+  # -----------------------------------------------------------
+
+  database:
+    container_name: database
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    networks:
+      - dropin
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - ./../../volumes/database/:/var/lib/postgresql/data
+
+  cache:
+    build:
+      context: ./redis
+      args:
+        - REDIS_VERSION=${REDIS_VERSION}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - dropin
+    ports:
+      - '${REDIS_PORT}:6379'
+    volumes:
+      - ./../../volumes/database/:/data
+
+  backend:
+    container_name: "backend"
+    restart: always
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    networks:
+      - dropin
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend.rule=Host(`${HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/socket.io`) )
+      - traefik.http.services.backend.loadbalancer.server.port=${API_PORT}
+    environment:
+      NODE_ENV: "production"
+      API_PREFIX: $API_PREFIX
+      OPEN_API_TITLE: $OPEN_API_TITLE
+      OPEN_API_VERSION: $OPEN_API_VERSION
+      API_PORT: $API_PORT
+      HOST: $HOST
+      DB_HOST: 'database'
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASS: $DB_PASS
+      DB_NAME: $DB_NAME
+      REDIS_HOST: 'cache'
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    volumes:
+      - ./../../volumes/logs/:/build/logs
+    depends_on:
+      - database
+      - cache
+      - traefik
+
+  # -----------------------------------------------------------
+  #
+  # -----------------------------------------------------------
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    networks:
+      - dropin
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.15.0
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kibana.rule=Host(`logs.${HOST}`)
+      - traefik.http.services.kibana.loadbalancer.server.port=5601
+    depends_on:
+      - backend
+    networks:
+      - dropin
+
+  filebeat:
+    build:
+      context: ./filebeat
+    container_name: filebeat
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./../../volumes/logs:/src/logs
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - dropin
+
+networks:
+  dropin:
+    driver: bridge
