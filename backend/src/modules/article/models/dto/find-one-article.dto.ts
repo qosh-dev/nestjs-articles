@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
-import { FindOneBaseDto } from 'src/libs/dto/find-one-base.dto';
+import { FindOneBaseDto } from '../../../../libs/dto/find-one-base.dto';
 
 @Exclude()
 export class FindOneArticleDto extends FindOneBaseDto {

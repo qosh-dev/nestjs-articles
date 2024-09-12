@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsNumberString, IsOptional, IsString } from 'class-validator';
-import { FindManyBaseDto } from 'src/libs/dto/find-many-base/find-many-base.dto';
+import { FindManyBaseDto } from '../../../../libs/dto/find-many-base/find-many-base.dto';
 import { SortEnum } from '../enum/sort.enum';
 import { IFindManyArticle } from '../interface/find-many-article.interface';
 

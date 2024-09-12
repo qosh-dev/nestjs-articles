@@ -2,17 +2,18 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import { AppModule } from '../../../app.module';
-import { TestService } from '../../../helpers/test.service';
+import { DatabaseError } from '../../../database/database.common';
+import { TestService } from '../../../libs/test/test.service';
 import { UserEntity } from '../../user/user.entity';
 import { UserService } from '../../user/user.service';
-import { ArticleEntity } from '../article.entity';
 import { ArticleService } from '../article.service';
+import { CreateOneArticleResponse } from '../models/dto/create-one-article.response';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let articleService: ArticleService;
   let userService: UserService;
-  let createdArticle: ArticleEntity;
+  let createdArticle: CreateOneArticleResponse;
   let createdUser: UserEntity;
 
   beforeEach(async () => {
@@ -34,7 +35,7 @@ describe('AuthController (e2e)', () => {
 
   it('should create a new user', async () => {
     const newUser = { username: 'new-user', password: 'valid-password' };
-    const user = await userService.create(newUser);
+    const user = await userService.createOne(newUser);
     expect(user).toBeInstanceOf(UserEntity);
     createdUser = user;
   });
@@ -47,18 +48,19 @@ describe('AuthController (e2e)', () => {
         authorId: createdUser.id,
       };
       createdArticle = await articleService.create(payload);
-      expect(createdArticle).toBeInstanceOf(ArticleEntity);
+      expect(createdArticle).toBeInstanceOf(CreateOneArticleResponse);
     });
 
-    it('should return null for creation error', async () => {
+    it('should return DUBLICATE_RECORD for creation error', async () => {
       const payload = {
         title: 'Test Article',
         description: 'This is a test content',
         authorId: randomUUID(),
       };
 
-      const createdArticle = await articleService.create(payload);
-      expect(createdArticle).toBeNull();
+      await expect(articleService.create(payload)).rejects.toThrowError(
+        DatabaseError.DUBLICATE_RECORD,
+      );
     });
   });
 
@@ -69,13 +71,7 @@ describe('AuthController (e2e)', () => {
       });
       expect(article.title).toEqual(createdArticle.title);
     });
-
     it('should return null for no matching article', async () => {
-      const article = await articleService.findOneBy({});
-      expect(article).toBeNull();
-    });
-
-    it('should return null for empty payload', async () => {
       const article = await articleService.findOneBy({});
       expect(article).toBeNull();
     });
@@ -83,20 +79,23 @@ describe('AuthController (e2e)', () => {
 
   describe('FindManyBy', () => {
     it('should retrieve multiple articles with default pagination', async () => {
-      const articles = await articleService.findManyBy({});
-      expect(articles).toEqual([createdArticle]);
+      const result = await articleService.findManyBy({});
+      expect(result.data[0].id).toEqual(createdArticle.id);
+      expect(result.total).toEqual(1);
     });
 
     it('should retrieve empty array of articles', async () => {
-      const articles = await articleService.findManyBy({ ids: [randomUUID()] });
-      expect(articles).toEqual([]);
+      const result = await articleService.findManyBy({ ids: [randomUUID()] });
+      expect(result.data).toEqual([]);
+      expect(result.total).toEqual(0);
     });
 
     it('should retrieve created articles by title', async () => {
-      const articles = await articleService.findManyBy({
+      const result = await articleService.findManyBy({
         title: createdArticle.title,
       });
-      expect(articles).toEqual([createdArticle]);
+      expect(result.data[0].id).toEqual(createdArticle.id);
+      expect(result.total).toEqual(1);
     });
   });
 

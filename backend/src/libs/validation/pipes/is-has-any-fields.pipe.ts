@@ -3,7 +3,7 @@ import {
   PipeTransform,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { CommonError } from 'src/libs/common/common.error';
+import { CommonError } from '../../common/common.error';
 
 export class IsHasAnyFieldsPipe<Model =any> implements PipeTransform {
   constructor(readonly oneOfRequiredFields: (keyof Model)[] = null) {}

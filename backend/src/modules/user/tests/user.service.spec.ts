@@ -2,7 +2,8 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import { AppModule } from '../../../app.module';
-import { TestService } from '../../../helpers/test.service';
+import { DatabaseError } from '../../../database/database.common';
+import { TestService } from '../../../libs/test/test.service';
 import { UserEntity } from '../user.entity';
 import { UserService } from '../user.service';
 
@@ -18,6 +19,7 @@ describe('AuthController (e2e)', () => {
 
     app = module.createNestApplication();
     userService = app.get(UserService);
+
     await app.init();
   });
 
@@ -29,44 +31,44 @@ describe('AuthController (e2e)', () => {
 
   it('should create a new user', async () => {
     const newUser = { username: 'new-user', password: 'valid-password' };
-    const user = await userService.create(newUser);
+    const user = await userService.createOne(newUser);
     expect(user).toBeInstanceOf(UserEntity);
     createdUser = user;
   });
 
   it('should throw an error for missing username', async () => {
     const newUser = { password: 'valid-password' } as any;
-    await expect(userService.create(newUser)).rejects.toThrowError(
-      'null value in column "username" of relation "user" violates not-null constraint',
+    await expect(userService.createOne(newUser)).rejects.toThrowError(
+      DatabaseError.INVALID_PAYLOAD,
     );
   });
 
   it('should throw an error for missing password', async () => {
     const newUser = { username: 'new-user' } as any;
-    await expect(userService.create(newUser)).rejects.toThrowError(
-      'null value in column "password" of relation "user" violates not-null constraint',
+    await expect(userService.createOne(newUser)).rejects.toThrowError(
+      DatabaseError.INVALID_PAYLOAD
     );
   });
 
   it('should find a user by id', async () => {
-    const user = await userService.findOneBy({ id: createdUser.id });
+    const user = await userService.findOne({ id: createdUser.id });
     expect(user).toEqual(createdUser);
   });
 
   it('should find a user by username', async () => {
-    const user = await userService.findOneBy({
+    const user = await userService.findOne({
       username: createdUser.username,
     });
     expect(user).toEqual(createdUser);
   });
 
   it('should return null for no matching user', async () => {
-    const user = await userService.findOneBy({ id: randomUUID() });
+    const user = await userService.findOne({ id: randomUUID() });
     expect(user).toBeNull();
   });
 
   it('should return null for empty payload', async () => {
-    const user = await userService.findOneBy({});
+    const user = await userService.findOne({});
     expect(user).toBeNull();
   });
 });

@@ -9,11 +9,11 @@ import {
 import { ApiResponse as ApiResponseBase } from '@nestjs/swagger';
 
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import { InvalidateCached } from 'src/libs/cache/decorators/cache-invalidate.interceptor';
-import { CacheIt } from 'src/libs/cache/decorators/cache.interceptor';
-import { CommonError } from 'src/libs/common/common.error';
-import { FindManyResponseBase } from 'src/libs/dto/find-many-base.response';
-import { ApiResponse } from 'src/libs/open-api/decorators/api-response.decorator';
+import { InvalidateCached } from '../../libs/cache/decorators/cache-invalidate.interceptor';
+import { CacheIt } from '../../libs/cache/decorators/cache.interceptor';
+import { CommonError } from '../../libs/common/common.error';
+import { FindManyResponseBase } from '../../libs/dto/find-many-base.response';
+import { ApiResponse } from '../../libs/open-api/decorators/api-response.decorator';
 import { Authorized } from '../auth/decorator/authorized.decorator';
 import { ArticleError } from './article.common';
 import { CreateOneArticleDto } from './models/dto/create-one-article.dto';

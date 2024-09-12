@@ -1,6 +1,6 @@
 import { applyDecorators, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { ApiResponse } from 'src/libs/open-api/decorators/api-response.decorator';
+import { ApiResponse } from '../../../libs/open-api/decorators/api-response.decorator';
 import { AuthError } from '../auth.common';
 import { AuthGuard } from '../guards/auth.guard';
 

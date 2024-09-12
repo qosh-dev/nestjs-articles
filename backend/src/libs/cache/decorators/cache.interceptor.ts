@@ -37,6 +37,7 @@ export function CacheInterceptor(
 
       return next.handle().pipe(
         tap(async (body) => {
+          if (!body) return body
           if (body.data) {
             let records = [];
             for (let record of body.data) {

@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import * as jwt from 'jsonwebtoken';
-import { BaseEntity } from 'src/database/structs/entity';
+import { BaseEntity } from '../../../database/structs/entity';
 import {
   IRequestContext,
   SystemHeaders,
-} from 'src/libs/als/app-context.common';
-import { UserService } from 'src/modules/user/user.service';
+} from '../../../libs/als/app-context.common';
+import { UserService } from '../../../modules/user/user.service';
 import { CurrentUserModel } from '../models/current-user.model';
 
 @Injectable()

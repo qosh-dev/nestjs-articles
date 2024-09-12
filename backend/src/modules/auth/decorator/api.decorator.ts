@@ -5,7 +5,7 @@ import {
   ApiOperation,
   ApiResponse as ApiResponseBase,
 } from '@nestjs/swagger';
-import { ApiResponse } from 'src/libs/open-api/decorators/api-response.decorator';
+import { ApiResponse } from '../../../libs/open-api/decorators/api-response.decorator';
 import { AuthError } from '../auth.common';
 import { SignInDto } from '../models/dto/sign-in.dto';
 import { SignUpDto } from '../models/dto/sign-up.dto';

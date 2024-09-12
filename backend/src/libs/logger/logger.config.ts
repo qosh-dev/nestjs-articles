@@ -6,8 +6,8 @@ import { Params } from 'nestjs-pino';
 import * as path from 'path';
 import pino, { DestinationStream } from 'pino';
 import { Options } from 'pino-http';
-import { NodeEnv } from 'src/config/config-validation';
-import { Envs } from 'src/config/config.module';
+import { NodeEnv } from '../../config/config-validation';
+import { Envs } from '../../config/config.module';
 import { IRequestContext, SystemHeaders } from '../als/app-context.common';
 import { TransportType } from './logger.type';
 

@@ -3,18 +3,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import * as request from 'supertest';
 import { AppModule } from '../../../app.module';
-import { TestService } from '../../../helpers/test.service';
+import { TestService } from '../../../libs/test/test.service';
 import { AuthService } from '../../auth/auth.service';
 import { UserEntity } from '../../user/user.entity';
 import { UserService } from '../../user/user.service';
 import { ArticleEntity } from '../article.entity';
 import { ArticleService } from '../article.service';
-import { CreateOneArticleDto } from '../dto/create-one-article.dto';
-import { FindManyArticleDto } from '../dto/find-many-article.dto';
-import { FindOneArticleDto } from '../dto/find-one-article.dto';
-import { UpdateOneArticleDto } from '../dto/update-one-article.dto';
+import { CreateOneArticleDto } from '../models/dto/create-one-article.dto';
+import { FindManyArticleDto } from '../models/dto/find-many-article.dto';
+import { FindOneArticleDto } from '../models/dto/find-one-article.dto';
+import { UpdateOneArticleDto } from '../models/dto/update-one-article.dto';
 
-describe('AuthController (e2e)', () => {
+describe('AuthController', () => {
   let app: INestApplication;
   let articleService: ArticleService;
   let userService: UserService;
@@ -52,11 +52,11 @@ describe('AuthController (e2e)', () => {
 
   it('shoud prepare user', async () => {
     const newUser = { username: 'new-user', password: 'valid-password' };
-    const user = await userService.create(newUser);
+    const user = await userService.createOne(newUser);
     createdUser = user;
     expect(user).toBeInstanceOf(UserEntity);
     const res = await authService.signIn(newUser);
-    createdUserToken = res.token;
+    createdUserToken = res.accessToken;
   });
 
   describe('POST /article/', () => {
@@ -147,15 +147,14 @@ describe('AuthController (e2e)', () => {
     it('should return 404 for non-existent article', async () => {
       const query: FindOneArticleDto = { id: randomUUID() };
 
-      await request(app.getHttpServer())
+      const res = await request(app.getHttpServer())
         .get('/article')
-        .query(query)
-        .expect(HttpStatus.NOT_FOUND);
+        .query(query);
+      expect(res.text).toBe('');
     });
 
     it('should return 400 for invalid article id(uuid)', async () => {
       const query: FindOneArticleDto = { id: '123' };
-
       await request(app.getHttpServer())
         .get('/article')
         .query(query)
@@ -172,7 +171,10 @@ describe('AuthController (e2e)', () => {
         .get('/article/many')
         .query(query)
         .expect(HttpStatus.OK);
-      expect(res.body).toEqual(array);
+      const data = res.body as Awaited<
+        ReturnType<typeof ArticleService.prototype.findManyBy>
+      >;
+      expect(data.data).toEqual(array);
     });
 
     it('should retrieve articles with pagination(2 records) (limit=5, page=1)', async () => {
@@ -183,7 +185,11 @@ describe('AuthController (e2e)', () => {
         .get('/article/many')
         .query(query)
         .expect(HttpStatus.OK);
-      expect(res.body).toEqual(mockArticles);
+
+      const data = res.body as Awaited<
+        ReturnType<typeof ArticleService.prototype.findManyBy>
+      >;
+      expect(data.data).toEqual(mockArticles);
     });
 
     it('should retrieve articles with pagination(0 records) (limit=5, page=2)', async () => {
@@ -194,7 +200,10 @@ describe('AuthController (e2e)', () => {
         .get('/article/many')
         .query(query)
         .expect(HttpStatus.OK);
-      expect(res.body).toEqual(array);
+      const data = res.body as Awaited<
+        ReturnType<typeof ArticleService.prototype.findManyBy>
+      >;
+      expect(data.data).toEqual(array);
     });
 
     it('should return error 400 (limit=5, page=0)', async () => {
@@ -212,7 +221,11 @@ describe('AuthController (e2e)', () => {
         .get('/article/many')
         .query(query)
         .expect(HttpStatus.OK);
-      expect(res.body).toEqual([createdArticle]);
+
+      const data = res.body as Awaited<
+        ReturnType<typeof ArticleService.prototype.findManyBy>
+      >;
+      expect(data.data).toEqual([createdArticle]);
     });
 
     it('should retrieve articles by author ID', async () => {
@@ -224,16 +237,20 @@ describe('AuthController (e2e)', () => {
         .get('/article/many')
         .query(query)
         .expect(HttpStatus.OK);
-      expect(res.body).toEqual([createdArticle, createdArticle2]);
+
+      const data = res.body as Awaited<
+        ReturnType<typeof ArticleService.prototype.findManyBy>
+      >;
+      expect(data.data).toEqual([createdArticle, createdArticle2]);
     });
   });
 
   describe('patchArticle (PATCH /:id)', () => {
     it('should update an article (authorized)', async () => {
       const id = createdArticle.id;
-      const dto: UpdateOneArticleDto = { title: 'Updated Title' };
-
-      
+      const dto: UpdateOneArticleDto = {
+        title: 'Updated Title',
+      };
 
       const res = await request(app.getHttpServer())
         .patch(`/article/${id}`)

@@ -4,7 +4,7 @@ import { IsOptional, IsString } from 'class-validator';
 import { IUpdateOneArticle } from '../interface/update-one-article.interface';
 
 @Exclude()
-export class UpdateOneArticleDto implements IUpdateOneArticle {
+export class UpdateOneArticleDto implements Omit<IUpdateOneArticle, 'id' | "authorId"> {
   @ApiProperty({
     description: 'Article title',
     required: false,
@@ -23,6 +23,4 @@ export class UpdateOneArticleDto implements IUpdateOneArticle {
   @IsString()
   description?: string;
 
-  id: string;
-  authorId: string;
 }

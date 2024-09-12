@@ -1,8 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { NodeEnv } from 'src/config/config-validation';
-import { Envs } from 'src/config/config.module';
+import { NodeEnv } from '../../config/config-validation';
+import { Envs } from '../../config/config.module';
 
 const logger: Logger = new Logger('Open Api');
 

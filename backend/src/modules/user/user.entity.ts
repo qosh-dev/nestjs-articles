@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcryptjs';
-import { BaseEntity } from 'src/database/structs/entity';
 import { BeforeInsert, Column, Entity, Index, OneToMany } from 'typeorm';
+import { BaseEntity } from '../../database/structs/entity';
 import { ArticleEntity } from '../article/article.entity';
 
 @Entity('user')

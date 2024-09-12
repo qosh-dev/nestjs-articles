@@ -1,10 +1,10 @@
-import { BaseEntity } from 'src/database/structs/entity';
 import {
   Column,
   Entity,
   Index,
   ManyToOne
 } from 'typeorm';
+import { BaseEntity } from '../../database/structs/entity';
 import { UserEntity } from '../user/user.entity';
 
 @Entity('article') 

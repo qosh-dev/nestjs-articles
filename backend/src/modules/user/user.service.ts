@@ -12,9 +12,9 @@ export class UserService {
     return this.repo.createOne(props, t);
   }
 
-  async findOne<
-    I extends FindOptionsWhere<UserEntity> | FindOptionsWhere<UserEntity>,
-  >(payload: I): Promise<UserEntity | null> {
+  async findOne(
+    payload: FindOptionsWhere<UserEntity> | FindOptionsWhere<UserEntity>,
+  ): Promise<UserEntity | null> {
     const filters = Object.values(payload).filter((f) => f);
     if (!filters.length) {
       return null;

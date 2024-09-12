@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsDefined, IsEnum } from 'class-validator';
-import { EnumAsUnion, IFindManyBaseSortItem, SortOrderEnum } from 'src/database/structs/types';
+import {
+  EnumAsUnion,
+  IFindManyBaseSortItem,
+  SortOrderEnum,
+} from '../../../database/structs/types';
 
 /**
  * Function that creates a dynamic sort item class for querying entities.

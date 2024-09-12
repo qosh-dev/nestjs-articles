@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { DatabaseException } from '../../database/exception.decorator';
 import { ArticleError } from './article.common';
-import { ArticleEntity } from './article.entity';
 import { ArticleRepository } from './article.repository';
 import { CreateOneArticleResponse } from './models/dto/create-one-article.response';
 import { FindManyArticleItemResponse } from './models/dto/find-many-article-item.response';
@@ -24,59 +24,28 @@ export class ArticleService {
   }
 
   async findOneBy(payload: FindOneArticleDto) {
+    if (!Object.keys(payload).length) {
+      return null;
+    }
     const record = await this.repo.findOneBy(payload);
     return FindOneArticleResponse.serialize(record);
   }
 
+  @DatabaseException()
   async findManyBy(payload: IFindManyArticle) {
-    const { page, limit, sort, ids = [], ...filter } = payload;
-    const skip = (page - 1) * limit;
-    const qb = this.repo.orm.createQueryBuilder(ArticleEntity, 'article');
-
-    if (ids && ids.length) {
-      qb.andWhereInIds(Array.isArray(ids) ? ids : [ids]);
-    } else {
-      for (let key in filter) {
-        if (!filter[key]) continue;
-        if (key === 'createdAtGte') {
-          qb.andWhere('article.createdAt >= :createdAtGte', {
-            createdAtGte: new Date(+filter[key]),
-          });
-        } else if (key === 'createdAtLte') {
-          qb.andWhere('article.createdAt <= :createdAtLte', {
-            createdAtLte: new Date(+filter[key]),
-          });
-        } else if (key === 'authorUserName') {
-          qb.innerJoin('article.author', 'author');
-          qb.andWhere('LOWER(author.username) LIKE :authorUserName', {
-            authorUserName: `%${filter[key].toLocaleLowerCase()}%`,
-          });
-        } else {
-          qb.andWhere(`article.${key} = :${key}`, { [key]: filter[key] });
-        }
-      }
-
-      if (sort && sort.length) {
-        for (const s of sort) {
-          qb.addOrderBy(`article.${s.column}`, s.order);
-        }
-      }
-    }
-
-    qb.take(limit);
-    qb.skip(skip);
-    const [records, totalCount] = await qb.getManyAndCount();
-
-    return this.repo.toManyResponse({
-      page: payload.page,
-      take: payload.limit,
-      result: FindManyArticleItemResponse.serialize(records),
-      totalCount: totalCount,
-    });
+    const result = await this.repo.findManyBy(payload);
+    return {
+      ...result,
+      data: FindManyArticleItemResponse.serialize(result.data),
+    };
   }
 
   async updateOne(payload: IUpdateOneArticle) {
     const { id, authorId, ...updateProps } = payload;
+
+    if (!Object.keys(updateProps).length) {
+      return false;
+    }
     const recordExist = await this.repo.existBy({
       id,
       authorId,
@@ -106,5 +75,4 @@ export class ArticleService {
       return false;
     }
   }
-
 }

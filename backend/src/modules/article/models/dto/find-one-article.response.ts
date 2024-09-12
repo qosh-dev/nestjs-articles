@@ -35,13 +35,13 @@ export class FindOneArticleResponse{
   authorId: string;
 
 static  serialize(model: ArticleEntity): FindOneArticleResponse {
-  if(!model) return null
-    return {
-      id: model.id,
-      title: model.title,
-      description: model.description,
-      createdAt: model.createdAt,
-      authorId: model.authorId,
-    };
+  if(!model) return model
+  const record = new FindOneArticleResponse();
+  record.id = model.id;
+  record.title = model.title;
+  record.description = model.description;
+  record.createdAt = model.createdAt;
+  record.authorId = model.authorId;
+  return record;
   }
 }

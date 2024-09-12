@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { randomUUID } from 'crypto';
-import { UserEntity } from 'src/modules/user/user.entity';
+import { UserEntity } from '../../../modules/user/user.entity';
 
 export class CurrentUserModel {
   @ApiProperty({

@@ -2,9 +2,9 @@ import { UnprocessableEntityException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 import { IsInt, IsOptional, Min } from 'class-validator';
-import { IFindManyBase, IFindManyBaseSortItem, SortOrderEnum } from 'src/database/structs/types';
-import { CommonError } from 'src/libs/common/common.error';
-import { IdsDtoOptional } from 'src/libs/dto/ids.dto';
+import { IFindManyBase, IFindManyBaseSortItem, SortOrderEnum } from '../../../database/structs/types';
+import { CommonError } from '../../../libs/common/common.error';
+import { IdsDtoOptional } from '../../../libs/dto/ids.dto';
 import { isEqualStringArray } from '../../common/methods';
 import { FindManyBaseSortItem } from './find-many-base-sort-item';
 

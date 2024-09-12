@@ -1,7 +1,7 @@
 import { Body, Controller, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { IdDto } from 'src/libs/dto/id.dto';
-import { IsHasAnyFieldsPipe } from 'src/libs/validation/pipes/is-has-any-fields.pipe';
+import { IdDto } from '../../libs/dto/id.dto';
+import { IsHasAnyFieldsPipe } from '../../libs/validation/pipes/is-has-any-fields.pipe';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { CurrentUserModel } from '../auth/models/current-user.model';
 import {

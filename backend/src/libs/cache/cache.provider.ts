@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import Redis, { RedisOptions } from 'ioredis';
-import { Envs } from 'src/config/config.module';
+import { Envs } from '../../config/config.module';
 
 @Injectable()
 export class CacheService {
@@ -72,7 +72,6 @@ export class CacheService {
     let keyParts: string[] = [];
 
     for (const arg of args) {
-      console.log({ arg });
       if (typeof arg === 'string' || typeof arg === 'number') {
         keyParts.push(String(arg));
       } else if (typeof arg === 'object') {
@@ -86,11 +85,6 @@ export class CacheService {
           }
         }
       }
-    }
-
-    if (!keyParts.length) {
-      console.log({ args, context });
-      throw new Error('Invalid key');
     }
 
     return 'cached_' + context + '_' + keyParts.join('_');

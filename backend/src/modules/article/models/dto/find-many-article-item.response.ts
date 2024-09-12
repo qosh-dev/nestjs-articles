@@ -35,12 +35,14 @@ export class FindManyArticleItemResponse {
   authorId: string;
 
   static serialize(models: ArticleEntity[]): FindManyArticleItemResponse[] {
-    return models.map((model) => ({
-      id: model.id,
-      title: model.title,
-      description: model.description,
-      createdAt: model.createdAt,
-      authorId: model.authorId,
-    }));
+    return models.map((model) => {
+      const record = new FindManyArticleItemResponse();
+      record.id = model.id;
+      record.title = model.title;
+      record.description = model.description;
+      record.createdAt = model.createdAt;
+      record.authorId = model.authorId;
+      return record;
+    });
   }
 }

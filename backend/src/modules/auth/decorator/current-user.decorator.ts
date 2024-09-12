@@ -3,7 +3,7 @@ import {
   UnauthorizedException,
   createParamDecorator,
 } from '@nestjs/common';
-import { UserEntity } from 'src/modules/user/user.entity';
+import { UserEntity } from '../../../modules/user/user.entity';
 import { CurrentUserModel } from '../models/current-user.model';
 
 export function CurrentUser(...keys: (keyof UserEntity)[]) {

@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { ArticleEntity } from '../modules/article/article.entity';
+import { UserEntity } from '../modules/user/user.entity';
 dotenv.config({ path: '../.env' });
 
 
@@ -12,12 +14,16 @@ export let dataSourceOptions: DataSourceOptions = {
   typename: '__typename',
   type: 'postgres',
   synchronize: false,
-  entities: ['dist/**/*.entity.js'],
+  // entities: ['dist/**/*.entity.{js,ts}'],
+  entities:[
+    ArticleEntity,
+    UserEntity
+  ]
 };
 
 const dataSource = new DataSource({
   ...dataSourceOptions,
-  migrations: ['src/database/migrations/*.ts'],
+  migrations: ['src/database/migrations/*.{js,ts}'],
   migrationsTableName: 'migrations',
 });
 export default dataSource;

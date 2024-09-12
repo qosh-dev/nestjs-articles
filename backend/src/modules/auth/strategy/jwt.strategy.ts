@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { plainToInstance } from 'class-transformer';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Envs } from 'src/config/config.module';
+import { Envs } from '../../../config/config.module';
 import { UserService } from '../../user/user.service';
 import { AuthError } from '../auth.common';
 import { JWTStrategyValidatePayload } from '../auth.types';

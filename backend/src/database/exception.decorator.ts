@@ -5,8 +5,8 @@ import {
   Logger,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { CommonError } from 'src/libs/common/common.error';
 import { EntityPropertyNotFoundError, QueryFailedError } from 'typeorm';
+import { CommonError } from '../libs/common/common.error';
 import { DatabaseError } from './database.common';
 
 function DatabaseExceptionDecorator(
@@ -40,6 +40,10 @@ function handleError(error: any, logger: Logger) {
   if (error instanceof QueryFailedError) {
     if (error.driverError.code === '23505') {
       throw new BadRequestException(DatabaseError.DUBLICATE_RECORD);
+    }
+
+    if (error.driverError.code === '23502') {
+      throw new BadRequestException(DatabaseError.INVALID_PAYLOAD);
     }
 
     throw new BadRequestException();

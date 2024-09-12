@@ -1,7 +1,8 @@
 import { INestApplication, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../../app.module';
-import { TestService } from '../../../helpers/test.service';
+import { TestService } from '../../../libs/test/test.service';
+import { AuthError } from '../auth.common';
 import { AuthService } from '../auth.service';
 import { SignInDto } from '../models/dto/sign-in.dto';
 import { SignUpDto } from '../models/dto/sign-up.dto';
@@ -20,10 +21,6 @@ describe('AuthController (e2e)', () => {
     await app.init();
   });
 
-  // afterEach(async () => {
-  //   await wait(500);
-  // });
-
   afterAll(async () => {
     const testService = app.get(TestService);
     await testService.afterAll();
@@ -36,8 +33,8 @@ describe('AuthController (e2e)', () => {
     signUpDto.password = 'valid-password';
 
     const res = await authService.signUp(signUpDto);
-    expect(res).toHaveProperty('token');
-    expect(res.token).toBeDefined();
+    expect(res.accessToken).toBeDefined();
+    expect(res.refreshToken).toBeDefined();
   });
 
   it('should throw an error for username already existing', async () => {
@@ -46,7 +43,7 @@ describe('AuthController (e2e)', () => {
     signUpDto.password = 'valid-password123123';
 
     await expect(authService.signUp(signUpDto)).rejects.toThrowError(
-      'User already exist',
+      AuthError.USER_ALREADY_EXIST
     );
   });
 
@@ -56,8 +53,8 @@ describe('AuthController (e2e)', () => {
     signInDto.password = 'valid-password';
 
     const res = await authService.signIn(signInDto);
-    expect(res).toHaveProperty('token');
-    expect(res.token).toBeDefined();
+    expect(res.accessToken).toBeDefined();
+    expect(res.refreshToken).toBeDefined();
   });
 
   it('should throw an error for password mismatch', async () => {
@@ -69,4 +66,17 @@ describe('AuthController (e2e)', () => {
       UnauthorizedException,
     );
   });
+
+
+
+  it('should throw an error for password mismatch', async () => {
+    const signInDto = new SignInDto();
+    signInDto.username = 'new-user111111';
+    signInDto.password = 'wrong-password';
+
+    await expect(authService.signIn(signInDto)).rejects.toThrowError(
+      UnauthorizedException,
+    );
+  });
+
 });

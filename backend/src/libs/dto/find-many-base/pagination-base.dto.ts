@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 import { IsInt, IsOptional, Min } from 'class-validator';
-import { IFindPaginationBase } from 'src/database/structs/types';
+import { IFindPaginationBase } from '../../../database/structs/types';
 
 export class PaginationBaseDto implements IFindPaginationBase {
   @ApiProperty({

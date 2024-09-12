@@ -7,7 +7,7 @@ import {
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
-import { Envs } from 'src/config/config.module';
+import { Envs } from '../../config/config.module';
 import { UserEntity } from '../user/user.entity';
 import { UserService } from '../user/user.service';
 import { AuthError } from './auth.common';
@@ -80,6 +80,15 @@ export class AuthService {
 
   // -------------------------------------------------------
 
+
+  async encryptRefreshToken(token: string) {
+    const payload = jwt.verify(token, Envs.JWT_REFRESH) as unknown as {
+      data: JWTPayload;
+    };
+
+    return payload.data;
+  }
+  
   private createTokenPayload(user: UserEntity): JWTPayload {
     return { id: user.id };
   }
@@ -116,11 +125,5 @@ export class AuthService {
     return await bcrypt.compare(withPassword, hashedPassword);
   }
 
-  async encryptRefreshToken(token: string) {
-    const payload = jwt.verify(token, Envs.JWT_REFRESH) as unknown as {
-      data: JWTPayload;
-    };
 
-    return payload.data;
-  }
 }
